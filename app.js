@@ -4,6 +4,8 @@ const app = express();
 
 const authRoutes = require('./routes/authRoutes');
 
+const restaurantRoutes = require('./routes/restaurantRoutes');
+
 app.use(express.json());
 
 app.get('/', (req, res) => {
@@ -14,5 +16,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/api/auth', authRoutes);
+
+app.use('/api/restaurants', restaurantRoutes);
 
 module.exports = app;
