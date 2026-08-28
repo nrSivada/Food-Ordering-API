@@ -30,6 +30,28 @@ const createRestaurant = async(req, res)=> {
             message: "Internal server error."
         });
     }
-}
+};
 
-module.exports = {createRestaurant};
+const getRestaurant = async(req, res) =>{
+    try{
+        const restaurant = await Restaurant.find()
+
+        res.status(200).json({
+            success: true,
+            message: "Restaurants fetched successfully.",
+            data: restaurant
+        });
+    }
+    catch(error){
+        console.log(error);
+
+        res.status(500).json({
+            success: false,
+            message: "Internal server error."
+        });
+    }
+};
+
+
+
+module.exports = {createRestaurant, getRestaurant};
