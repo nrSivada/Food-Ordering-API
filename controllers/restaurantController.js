@@ -52,6 +52,33 @@ const getRestaurant = async(req, res) =>{
     }
 };
 
+const getRestaurantById = async(req, res) => {
+    try{
+        const {id} = req.params;
 
+        const restaurant = await Restaurant.findById(id);
 
-module.exports = {createRestaurant, getRestaurant};
+        if(!restaurant){
+            return res.status(404).json({
+                success: false,
+                message: "Restaurant not found."
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: "Restaurant fetched successfully.",
+            restaurant: restaurant
+        });
+    }
+    catch(error){
+        console.log(error);
+
+        res.status(500).json({
+            success: false,
+            message: "Internal server error."
+        });
+    }
+};
+
+module.exports = {createRestaurant, getRestaurant, getRestaurantById};
