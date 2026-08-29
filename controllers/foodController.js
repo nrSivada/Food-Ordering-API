@@ -87,6 +87,44 @@ const getRestaurantFood = async(req, res) =>{
             message: "Internal server error."
         });
     }
+};
+
+const updateFood = async(req, res) =>{
+    try{
+        const{ id } = req.params;
+
+        const food = await Food.findById(id);
+
+        if(!food){
+            return res.status(404).json({
+                success: false,
+                message: "Food not found."
+            });
+        }
+
+        const updatedFood = await Food.findByIdAndUpdate(
+            id, 
+            req.body,
+            {
+                new: true,
+                runValidators: true
+            }
+        );
+
+        res.status(200).json({
+            success: true,
+            message: "Food item updated successfully.",
+            food: updatedFood
+        });
+    }
+    catch(error){
+        console.log(error);
+
+        res.status(500).json({
+            success: false,
+            message: "Internal server error."
+        });
+    }
 }
 
-module.exports = {addFood, getRestaurantFood}
+module.exports = {addFood, getRestaurantFood, updateFood}
