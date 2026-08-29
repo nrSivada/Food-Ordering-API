@@ -155,6 +155,73 @@ const deleteFood = async(req, res) =>{
             message: "Internal server error."
         });
     }
+};
+
+const getFoods = async(req, res) => {
+    try{
+        const {search, category, restaurant, minPrice, maxPrice, isAvailable, page=1, limit=10} = req.query;
+
+        const filter = {};
+
+        if(search){
+            filter.name ={
+                $regex: search,
+                $options: 'i'
+            };
+        }
+        if(category){
+            filter.category = category;
+        }
+        if(restaurant){
+            filter.restaurant = restaurant;
+        }
+        if(minPrice !== undefined || maxPrice !== undefined){
+            filter.price={};
+
+            if(minPrice !== undefined){
+                filter.price.$gte = Number(minPrice);
+            }
+            if(maxPrice !== undefined){
+                filter.price.$lte = Number(maxPrice);
+            }
+        }
+        if(isAvailable !== undefined){
+            filter.isAvailable = isAvailable === "true";
+        }
+
+        const pageNumber = Number(page);
+        const limitNumber = Number(limit);
+
+        const skip = (pageNumber - 1)* limitNumber;
+
+        const foods = await Food.find(filter)
+            .populate('restaurant', 'restaurantName')
+            .skip(skip)
+            .limit(limitNumber);
+
+        const totalFoods = await Food.countDocuments(filter);
+
+        res.status(200).json({
+            success: true,
+            message: "Food items fetched successfully.",
+            data: foods,
+            pagination: {
+                currentPage: pageNumber,
+                totalPages: Math.ceil(totalFoods / limitNumber),
+                totalItems: totalFoods,
+                limit: limitNumber
+            }
+        });
+    }
+    catch(error){
+        console.log(error);
+
+        res.status(500).json({
+            success: false,
+            message: "Internal server error."
+        });
+    }
 }
 
-module.exports = {addFood, getRestaurantFood, updateFood, deleteFood}
+
+module.exports = {addFood, getRestaurantFood, updateFood, deleteFood, getFoods}
