@@ -56,4 +56,37 @@ const addFood = async(req, res) =>{
     }
 };
 
-module.exports = {addFood}
+const getRestaurantFood = async(req, res) =>{
+    try{
+        const { restaurantId } = req.params;
+
+        const restaurant = await Restaurant.findById(restaurantId);
+
+        if(!restaurant){
+            return res.status(404).json({
+                success: false,
+                message: "Restaurant not found."
+            });
+        }
+
+        const food = await Food.find({
+            restaurant: restaurantId
+        });
+
+        res.status(200).json({
+            success: true,
+            message: "Food items fetched successfully.",
+            Foods: food
+        });
+    }
+    catch(error){
+        console.log(error);
+
+        res.status(500).json({
+            success: false,
+            message: "Internal server error."
+        });
+    }
+}
+
+module.exports = {addFood, getRestaurantFood}
