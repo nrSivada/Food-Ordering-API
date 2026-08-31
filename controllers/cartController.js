@@ -59,6 +59,18 @@ const addToCart = async(req, res) =>{
                 quantity
             });
         }
+        let totalAmount=0;
+
+        for (const item of cart.items){
+            const foodItem = await Food.findById(item.food);
+
+            if(foodItem){
+                totalAmount += foodItem.price * item.quantity;
+            }
+        }
+
+        cart.totalAmount=totalAmount;
+
         await cart.save();
 
         res.status(200).json({
