@@ -10,6 +10,8 @@ const foodRoutes = require('./routes/foodRoutes');
 
 const cartRoutes = require('./routes/cartRoutes');
 
+const orderRoutes = require('./routes/orderRoutes');
+
 app.use(express.json());
 
 app.get('/', (req, res) => {
@@ -26,5 +28,7 @@ app.use('/api/restaurants', restaurantRoutes);
 app.use('/api', foodRoutes);
 
 app.use('/api/cart', cartRoutes);
+
+app.use('/api/orders', orderRoutes);
 
 module.exports = app;
