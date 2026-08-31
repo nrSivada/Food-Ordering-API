@@ -1,5 +1,5 @@
 const express = require('express');
-const { addToCart, getCart, updateCartItem, removeFromCart } = require('../controllers/cartController');
+const { addToCart, getCart, updateCartItem, removeFromCart, clearCart } = require('../controllers/cartController');
 const authMiddleware = require('../middleware/authMiddleware');
 
 const router = express.Router();
@@ -12,5 +12,7 @@ router.get('/', authMiddleware, getCart);
 router.put('/:foodId', authMiddleware, updateCartItem);
 
 router.delete('/:foodId', authMiddleware, removeFromCart);
+
+router.delete('/', authMiddleware, clearCart);
 
 module.exports = router;

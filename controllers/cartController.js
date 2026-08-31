@@ -269,6 +269,42 @@ const removeFromCart = async (req, res) =>{
             message: "Internal server error."
         });
     }
+};
+
+const clearCart = async (req, res) =>{
+    try{
+        const userId = req.user.userId;
+
+        const cart = await Cart.findOne({
+            user: userId
+        });
+
+        if(!cart){
+            return res.status(404).json({
+                success: false,
+                message: "Cart not found."
+            });
+        }
+
+        cart.items = [];
+        cart.totalAmount=0;
+
+        await cart.save();
+
+        res.status(200).json({
+            success: true,
+            message: "Cart cleared successfully."
+        });
+    }
+
+    catch(error){
+        console.log(error);
+
+        res.status(500).json({
+            success: false,
+            message: "Internal server error."
+        });
+    }
 }
 
-module.exports = {addToCart, getCart, updateCartItem, removeFromCart};
+module.exports = {addToCart, getCart, updateCartItem, removeFromCart, clearCart};
