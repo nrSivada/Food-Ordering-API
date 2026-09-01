@@ -203,7 +203,75 @@ const cancelOrder = async(req, res) => {
             message: "Internal server error."
         });
     }
+};
+
+const updateOrderStatus = async(req, res) => {
+    try {
+        const { id } = req.params;
+        const {status} = req.body;
+
+        if(!status){
+            return res.status(400).json({
+                success: false,
+                message: "Order status is required."
+            });
+        }
+
+        const validStatuses = ["PLACED", "CONFIRMED", "PREPARING", "OUT_FOR_DELIVERY", "DELIVERED", "CANCELLED"];
+
+        if(!validStatuses.includes(status)){
+            return res.status(400).json({
+                success: false,
+                message: "Invalid order status."
+            });
+        }
+
+        const order = await Order.findById(id);
+
+        if(!order){
+            return res.status(404).json({
+                success: false,
+                message: "Order not found."
+            });
+        }
+
+        const currentStatus =  order.orderStatus;
+
+        const allowedTransitions ={
+            PLACED: ["CONFIRMED", "CANCELLED"],
+            CONFIRMED: ["PREPARING", "CANCELLED"],
+            PREPARING: ["OUT_FOR_DELIVERY", "CANCELLED"],
+            OUT_FOR_DELIVERY: ["DELIVERED"],
+            DELIVERED: [],
+            CANCELLED: []
+        }
+
+        if (!allowedTransitions[currentStatus].includes(status)) {
+            return res.status(400).json({
+                success: false,
+                message: `Order cannot move from ${currentStatus} to ${status}.`
+            });
+        }
+
+        order.orderStatus = status;
+
+        await order.save();
+
+        res.status(200).json({
+            success: true,
+            message: "Order status updated successfully.",
+            data: order
+        });
+    }
+    catch (error) {
+        console.log(error);
+
+        res.status(500).json({
+            success: false,
+            message: "Internal server error."
+        });
+    }
 }
 
-module.exports = { placeOrder, getMyOrders, getOrderById, cancelOrder };
+module.exports = { placeOrder, getMyOrders, getOrderById, cancelOrder, updateOrderStatus };
 
