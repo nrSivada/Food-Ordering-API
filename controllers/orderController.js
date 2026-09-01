@@ -100,7 +100,110 @@ const placeOrder = async(req, res)=>{
             message: "Internal server error."
         });
     }
+};
+
+const getMyOrders = async(req, res)=>{
+    try{
+        const userId = req.user.userId;
+
+        const orders = await Order.find({
+            user: userId
+        })
+        .populate('restaurant', 'name cuisineType address')
+        .sort({createdAt:-1});
+
+        res.status(200).json({
+            success: true,
+            message: "Orders fetched successfully.",
+            data: orders
+        });
+    }
+    catch (error){
+        console.log(error);
+
+        res.status(500).json({
+            success: false,
+            message: "Internal server error."
+        });
+    }
+};
+
+const getOrderById = async(req, res) => {
+    try {
+        const userId = req.user.userId;
+        const { id } = req.params;
+
+        const order = await Order.findOne({
+            _id: id,
+            user: userId
+        })
+        .populate('restaurant', 'name cuisineType address phoneNumber');
+
+        if(!order){
+            return res.status(404).json({
+                success: false,
+                message: "Order not found."
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: "Order fetched successfully.",
+            data: order
+        });
+    }
+    catch (error) {
+        console.log(error);
+
+        res.status(500).json({
+            success: false,
+            message: "Internal server error."
+        });
+    }
+};
+
+const cancelOrder = async(req, res) => {
+    try {
+        const userId = req.user.userId;
+        const { id } = req.params;
+
+        const order = await Order.findOne({
+            _id: id,
+            user: userId
+        });
+
+        if(!order){
+            return res.status(404).json({
+                success: false,
+                message: "Order not found."
+            });
+        }
+
+        if(order.orderStatus !== "PLACED" && order.orderStatus !== "PREPARING"){
+            return res.status(400).json({
+                success: false,
+                message: `Order cannot be cancelled when status is ${order.orderStatus}.`
+            });
+        }
+        order.orderStatus = "CANCELLED";
+
+        await order.save();
+
+        res.status(200).json({
+            success: true,
+            message: "Order cancelled successfully.",
+            orders: order
+        });
+    }
+    catch (error){
+        console.log(error);
+
+        res.status(500).json({
+            success: false,
+            message: "Internal server error."
+        });
+    }
 }
 
-module.exports = { placeOrder };
+module.exports = { placeOrder, getMyOrders, getOrderById, cancelOrder };
 
