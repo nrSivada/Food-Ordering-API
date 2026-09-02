@@ -11,6 +11,8 @@ const foodRoutes = require('./routes/foodRoutes');
 const cartRoutes = require('./routes/cartRoutes');
 
 const orderRoutes = require('./routes/orderRoutes');
+const notFoundMiddleware = require('./middleware/notFoundMiddleware');
+const errorMiddleware = require('./middleware/errorMiddleware');
 
 app.use(express.json());
 
@@ -30,5 +32,9 @@ app.use('/api', foodRoutes);
 app.use('/api/cart', cartRoutes);
 
 app.use('/api/orders', orderRoutes);
+
+app.use(notFoundMiddleware);
+
+app.use(errorMiddleware);
 
 module.exports = app;
