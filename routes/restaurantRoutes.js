@@ -12,8 +12,9 @@ router.get('/', getRestaurant);
 
 router.get('/:id', getRestaurantById);
 
-router.put('/:id', updateRestaurant);
+router.put('/:id',authMiddleware, adminMiddleware, updateRestaurant);
 
-router.delete('/:id', deleteRestaurant);
+router.delete('/:id', authMiddleware, adminMiddleware, deleteRestaurant);
+
 
 module.exports = router;

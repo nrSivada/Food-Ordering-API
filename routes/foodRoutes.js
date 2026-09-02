@@ -9,9 +9,9 @@ router.post('/restaurants/:restaurantId/foods', authMiddleware, adminMiddleware,
 
 router.get('/restaurants/:restaurantId/foods', getRestaurantFood);
 
-router.put('/foods/:id', updateFood);
+router.put('/foods/:id', authMiddleware, adminMiddleware, updateFood);
 
-router.delete('/foods/:id', deleteFood);
+router.delete('/foods/:id',authMiddleware, adminMiddleware, deleteFood);
 
 router.get('/foods', getFoods)
 
